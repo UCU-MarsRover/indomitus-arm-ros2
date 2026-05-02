@@ -7,7 +7,7 @@
     Bringup package for the Indomitus arm, providing
     launch files and configuration for hardware
   </description>
-  <maintainer email="fito.pn@ucu.edu.ua">yurFitio</maintainer>
+  <maintainer email="kosiv.marta@gmail.com">Martik-k</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
