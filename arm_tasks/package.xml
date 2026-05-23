@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>arm_tasks</name>
+  <version>0.0.1</version>
+  <description>Task-level test scripts for the robotic arm.</description>
+
+  <maintainer email="user@example.com">user</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>control_msgs</exec_depend>
+  <exec_depend>trajectory_msgs</exec_depend>
+  <exec_depend>moveit_msgs</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>shape_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>python_qt_binding</exec_depend>
+</package>

@@ -1,1 +1,0 @@
-# indomitus-arm-ros2
