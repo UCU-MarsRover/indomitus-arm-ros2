@@ -1,0 +1,33 @@
+services:
+  arm_prod:
+    image: ${IMAGE_NAME:-ghcr.io/ucuspacerobotics/indomitus-arm-ros2}:${IMAGE_TAG:-develop-prod}
+    container_name: arm_prod
+    # command: autolaunch
+    command: tail -f /dev/null
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    # device_cgroup_rules:
+    #   - "c 13:* rmw"
+    stdin_open: true
+    tty: true
+    environment:
+      - ROS_DOMAIN_ID=43
+      - ROS_LOCALHOST_ONLY=0
+      - CAN_INTERFACE=can0
+      - SDL_VIDEODRIVER=dummy
+      - SDL_AUDIODRIVER=dummy
+    volumes:
+    - /home/ros/Indomitus/indomitus-arm-ros2/src:/opt/ws/src:rw
+    - /dev:/dev:rw
+    # - /dev/input:/dev/input:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
