@@ -141,5 +141,29 @@
     <!-- TCP (Tool Center Point) is a virtual point -->
     <link name="arm_tcp_link"/>
 
+    <!-- ROS 2 Control Configuration -->
+    <ros2_control name="ArmSystem" type="system">
+      <hardware>
+        <plugin>mock_components/GenericSystem</plugin>
+      </hardware>
+      <xacro:macro name="arm_joint_control" params="joint_name">
+        <joint name="${joint_name}">
+          <command_interface name="position">
+            <param name="min">${-pi}</param>
+            <param name="max">${pi}</param>
+          </command_interface>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+        </joint>
+      </xacro:macro>
+
+      <xacro:arm_joint_control joint_name="arm_mount_base_joint"/>
+      <xacro:arm_joint_control joint_name="arm_base_shoulder_joint"/>
+      <xacro:arm_joint_control joint_name="arm_shoulder_forearm_joint"/>
+      <xacro:arm_joint_control joint_name="arm_forearm_wrist_1_joint"/>
+      <xacro:arm_joint_control joint_name="arm_wrist_1_wrist_2_joint"/>
+      <xacro:arm_joint_control joint_name="arm_wrist_2_end_effector_joint"/>
+    </ros2_control>
+
   </xacro:macro>
 </robot>

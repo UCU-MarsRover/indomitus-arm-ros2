@@ -5,6 +5,8 @@
 **Arm Usage**
 * [Starting the Arm on the Jetson](#starting-the-arm-on-the-jetson)
 * [Starting the Arm in Simulation (Laptop)](#starting-the-arm-in-simulation-laptop)
+  * [Standalone Visualization](#standalone-visualization)
+  * [MoveIt Planning Simulation](#moveit-planning-simulation)
 * [Turning Off the Arm](#turning-off-the-arm)
 
 **Docker**
@@ -38,13 +40,44 @@ Follow these steps to power on and operate the robotic arm:
 
 ### Starting the Arm in Simulation (Laptop)
 
-Follow these steps to test the arm mathematically in RViz without physical motors:
+There are two simulation modes available locally. Choose based on what you need:
+
+| Mode | Launch file | Use case |
+|---|---|---|
+| Standalone visualization | `arm_bringup/arm_standalone.launch.py` | Quick URDF/mesh checks, verifying controller config, no planning needed |
+| MoveIt planning simulation | `arm_moveit_config/demo.launch.py` | Testing trajectories, kinematics, motion planning, task development |
+
+#### Standalone Visualization
+
+Starts RViz with Fake Hardware controllers but no motion planning stack. Useful for quickly
+inspecting the URDF model and confirming controller setup without the full MoveIt overhead.
 
 1. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
-2. **Run the standalone launch file:** From the bash terminal inside your Docker container, start the visualization and fake hardware controllers:
+2. **Run the standalone launch file:** From the bash terminal inside your Docker container:
 ```bash
 ros2 launch arm_bringup arm_standalone.launch.py
 ```
+
+#### MoveIt Planning Simulation
+
+Starts the full MoveIt 2 stack with motion planning, collision checking, and trajectory
+execution using Fake Hardware. This is the primary mode for developing and testing arm
+movements locally.
+
+1. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
+2. **Run the MoveIt demo launch file:** From the bash terminal inside your Docker container:
+```bash
+ros2 launch arm_moveit_config demo.launch.py
+```
+
+This starts the following nodes:
+- **`move_group`** — MoveIt planning node with OMPL and Pilz planners
+- **`robot_state_publisher`** — publishes TF transforms from the URDF
+- **`ros2_control`** with Fake Hardware controllers simulating joint execution
+- **RViz** with the MoveIt MotionPlanning plugin pre-configured
+
+In RViz, use the **MotionPlanning** panel to set a goal pose for the end-effector and click
+**Plan & Execute** to run a full plan-and-execute cycle.
 
 ### Turning Off the Arm
 
@@ -135,7 +168,7 @@ TODO Enter the remote Jetson container:
 
 * **`arm_description`** — URDF/Xacro models, `.stl` meshes for visuals and collisions, and virtual TCP definitions.
 * **`arm_hardware_interface`** — Custom `ros2_control` C++ plugin for parsing CAN bus frames and controlling physical actuators.
-* **`arm_moveit_config`** — Configuration files for MoveIt 2 (SRDF, kinematics, limits) and MoveIt Servo.
+* **`arm_moveit_config`** — MoveIt 2 configuration and launch infrastructure. Contains the SRDF, kinematics solver config (`kinematics.yaml`), joint limits, OMPL/Pilz planner settings, and controller mappings (`moveit_controllers.yaml`, `ros2_controllers.yaml`). Provides a full set of launch files: `demo.launch.py` for standalone simulation with motion planning, plus modular files (`move_group.launch.py`, `moveit_rviz.launch.py`, `spawn_controllers.launch.py`, etc.) for flexible bringup on the Jetson.
 * **`arm_tasks`** — Python scripts for high-level operations (joint control, Cartesian stepping, GUI control panel).
 * **`arm_bringup`** — Launch files to start the entire manipulator subsystem or standalone Fake Hardware components.
 * **`arm_sim`** — Packages linking the URDF to the Gazebo physics simulator via `gz_ros2_control`.
@@ -158,8 +191,10 @@ When developing and debugging the arm, these are the most common commands you wi
 
 | Command | Description |
 |---|---|
-| `ros2 run <package> <executable>` | Starts a single, isolated node (e.g., `ros2 run arm_tasks arm_panel`). |
-| `ros2 launch <package> <launch_file.py>` | Starts a complete subsystem (e.g., `ros2 launch arm_bringup arm_standalone.launch.py`). |
+| `ros2 run <package> <executable>` | Starts a single, isolated node. |
+| `ros2 launch <package> <launch_file.py>` | Starts a complete subsystem. |
+| `ros2 launch arm_bringup arm_standalone.launch.py` | Standalone RViz visualization with Fake Hardware, no planning. |
+| `ros2 launch arm_moveit_config demo.launch.py` | Full MoveIt simulation with motion planning and RViz. |
 
 ### Network Introspection & Debugging
 
@@ -169,3 +204,6 @@ When developing and debugging the arm, these are the most common commands you wi
 | `ros2 topic echo /joint_states` | Shows the live angular positions and velocities of the 6 joints. |
 | `ros2 topic hz /joint_states` | Calculates the publishing rate of the joint encoders. |
 | `ros2 param list` | Lists all configuration parameters available across the currently running nodes. |
+| `ros2 action list` | Lists active action servers, including MoveIt's `/move_action`. |
+| `ros2 action info /move_action` | Shows goal, result, and feedback types for the MoveIt planning action. |
+| `ros2 topic echo /display_planned_path` | Streams the planned trajectory as it is computed by `move_group`. |
