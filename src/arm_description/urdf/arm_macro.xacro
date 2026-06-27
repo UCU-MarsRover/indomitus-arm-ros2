@@ -36,7 +36,7 @@
       <child link="arm_base_link"/>
       <origin xyz="0 0 0.018" rpy="0 0 0"/> 
       <axis xyz="0 0 1"/>
-      <limit lower="${-pi}" upper="${pi}" effort="100" velocity="1"/>
+      <limit lower="${-pi}" upper="${pi}" effort="100.0" velocity="1.0"/>
     </joint>
 
     <link name="arm_base_link">
@@ -54,7 +54,7 @@
       <child link="arm_shoulder_link"/>
       <origin xyz="0 0.013 0.0945" rpy="0 0 ${-pi/2}"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${-pi/2}" upper="${pi}" effort="100" velocity="1"/>
+      <limit lower="${-pi/2}" upper="${pi}" effort="100.0" velocity="1.0"/>
     </joint>
 
     <link name="arm_shoulder_link">
@@ -72,7 +72,7 @@
       <child link="arm_forearm_link"/>
       <origin xyz="-0.057 0 0.5" rpy="0 0 0"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${-pi/2}" upper="${pi/2}" effort="100" velocity="1"/>
+      <limit lower="${-pi/2}" upper="${pi/2}" effort="100.0" velocity="1.0"/>
     </joint>
 
     <link name="arm_forearm_link">
@@ -90,7 +90,7 @@
       <child link="arm_wrist_1_link"/>
       <origin xyz="0.002175 0 0.4" rpy="${pi} ${pi} 0"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${-pi/2}" upper="${pi/2}" effort="100" velocity="1"/>
+      <limit lower="${-pi/2}" upper="${pi/2}" effort="100.0" velocity="1.0"/>
     </joint>
 
     <link name="arm_wrist_1_link">
@@ -108,7 +108,7 @@
       <child link="arm_wrist_2_link"/>
       <origin xyz="-0.067825 0 0.0353" rpy="0 ${pi/2} 0"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${-pi}" upper="${pi}" effort="100" velocity="1"/>
+      <limit lower="${-pi}" upper="${pi}" effort="100.0" velocity="1.0"/>
     </joint>
 
     <link name="arm_wrist_2_link">
@@ -121,12 +121,24 @@
       <xacro:dummy_inertia mass="0.3"/>
     </link>
 
-    <joint name="arm_tcp_joint" type="fixed">
+    <joint name="arm_wrist_2_end_effector_joint" type="revolute">
       <parent link="arm_wrist_2_link"/>
-      <child link="arm_tcp_link"/>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <child link="arm_end_effector_link"/>
+      <origin xyz="0 0 0.05" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="${-pi}" upper="${pi}" effort="100.0" velocity="1.0"/>
     </joint>
-    <!-- TCP (Tool Center Point) is a virtual point, it has no mass or collisions -->
+
+    <link name="arm_end_effector_link">
+      <xacro:dummy_inertia mass="0.2"/>
+    </link>
+
+    <joint name="arm_tcp_joint" type="fixed">
+      <parent link="arm_end_effector_link"/>
+      <child link="arm_tcp_link"/>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    </joint>
+    <!-- TCP (Tool Center Point) is a virtual point -->
     <link name="arm_tcp_link"/>
 
   </xacro:macro>
