@@ -44,18 +44,22 @@ There are two simulation modes available locally. Choose based on what you need:
 
 | Mode | Launch file | Use case |
 |---|---|---|
-| Standalone visualization | `arm_bringup/arm_standalone.launch.py` | Quick URDF/mesh checks, verifying controller config, no planning needed |
+| Standalone visualization | `arm_bringup/arm_standalone.launch.py` | Quick URDF/mesh checks, manual joint testing via GUI, no planning needed |
 | MoveIt planning simulation | `arm_moveit_config/demo.launch.py` | Testing trajectories, kinematics, motion planning, task development |
 
 #### Standalone Visualization
 
-Starts RViz with Fake Hardware controllers but no motion planning stack. Useful for quickly
-inspecting the URDF model and confirming controller setup without the full MoveIt overhead.
+Starts RViz with the Joint State Publisher GUI but no motion planning stack. Useful for quickly
+inspecting the URDF model, meshes, and TF tree without loading ros2_control or the full MoveIt overhead.
 
-1. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
-2. **Run the standalone launch file:** From the bash terminal inside your Docker container:
+1. **Allow GUI access:** Run the following command on your **host machine** terminal (not inside Docker) before launching:
 ```bash
-ros2 launch arm_bringup arm_standalone.launch.py
+   xhost +local:docker
+```
+2. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
+3. **Run the standalone launch file:** From the bash terminal inside your Docker container:
+```bash
+   ros2 launch arm_bringup arm_standalone.launch.py
 ```
 
 #### MoveIt Planning Simulation
@@ -64,17 +68,15 @@ Starts the full MoveIt 2 stack with motion planning, collision checking, and tra
 execution using Fake Hardware. This is the primary mode for developing and testing arm
 movements locally.
 
-1. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
-2. **Run the MoveIt demo launch file:** From the bash terminal inside your Docker container:
+1. **Allow GUI access:** Run the following command on your **host machine** terminal (not inside Docker) before launching:
 ```bash
-ros2 launch arm_moveit_config demo.launch.py
+   xhost +local:docker
 ```
-
-This starts the following nodes:
-- **`move_group`** — MoveIt planning node with OMPL and Pilz planners
-- **`robot_state_publisher`** — publishes TF transforms from the URDF
-- **`ros2_control`** with Fake Hardware controllers simulating joint execution
-- **RViz** with the MoveIt MotionPlanning plugin pre-configured
+2. **Build and start the container:** Please refer to the [Docker setup section](#docker) to complete this step.
+3. **Run the MoveIt demo launch file:** From the bash terminal inside your Docker container:
+```bash
+   ros2 launch arm_moveit_config demo.launch.py
+```
 
 In RViz, use the **MotionPlanning** panel to set a goal pose for the end-effector and click
 **Plan & Execute** to run a full plan-and-execute cycle.
@@ -107,6 +109,11 @@ docker compose build
 
 ### Start the Container and Build the Workspace
 
+> **GUI Requirement:** If you plan to run simulation tools like RViz on your local laptop, you must allow Docker to access your host machine's display server. Run the following command in your **host machine's terminal** (not inside Docker) before proceeding:
+> ```bash
+> xhost +local:docker
+> ```
+
 1. Start the container in the background:
 ```bash
 docker compose up -d
@@ -121,6 +128,17 @@ cd /opt/ws
 colcon build --symlink-install
 source install/setup.bash
 ```
+
+### Container Autolaunch Behavior
+
+The Docker environment is configured with an `entrypoint.bash` script. When deployed on the Jetson, the production container is set to automatically run this script with the `autolaunch` argument. This automatically sources the workspace and launches the core ROS 2 nodes without requiring an SSH connection.
+
+If you need to test the autolaunch sequence locally inside your development container, you can trigger it manually:
+```bash
+/entrypoint.bash autolaunch
+```
+
+Note: Ensure your workspace is built (colcon build) before testing the autolaunch locally, otherwise the script will not find the required packages.
 
 ### Image Tags Architecture
 
@@ -193,7 +211,7 @@ When developing and debugging the arm, these are the most common commands you wi
 |---|---|
 | `ros2 run <package> <executable>` | Starts a single, isolated node. |
 | `ros2 launch <package> <launch_file.py>` | Starts a complete subsystem. |
-| `ros2 launch arm_bringup arm_standalone.launch.py` | Standalone RViz visualization with Fake Hardware, no planning. |
+| `ros2 launch arm_bringup arm_standalone.launch.py` | Standalone RViz visualization with GUI sliders, no ros2_control or planning. |
 | `ros2 launch arm_moveit_config demo.launch.py` | Full MoveIt simulation with motion planning and RViz. |
 
 ### Network Introspection & Debugging
