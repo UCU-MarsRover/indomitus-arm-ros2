@@ -21,7 +21,7 @@ echo "[ROS] SUCCESS: Environment ready (${ROS_DISTRO})."
 # -------------------- Launch ROS2 nodes --------------------
 if [ "${1}" = "autolaunch" ]; then
     echo "[ARM] Starting standalone launch file..."
-    ros2 launch arm_bringup arm_integration.launch.py &
+    ros2 launch arm_bringup arm_standalone.launch.py &
     PID1=$!
 
     export LD_LIBRARY_PATH=/usr/lib/aarch64-linux-gnu/tegra:$LD_LIBRARY_PATH
