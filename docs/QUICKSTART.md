@@ -101,9 +101,7 @@ The `arm_macro.xacro` model exposes a `use_fake_hardware` xacro argument that co
 
 Because `mock_components/GenericSystem` reports back whatever position it was just told to move
 to, it does **not** validate motor dynamics, CAN latency, encoder noise, or mechanical limits like
-backlash or sag — only the kinematic/geometric correctness of a trajectory is verified. For
-physics-aware simulation (inertia, joint limits, realistic dynamics), use the `arm_sim` package
-with Gazebo instead.
+backlash or sag — only the kinematic/geometric correctness of a trajectory is verified.
 
 ### Turning Off the Arm
 
