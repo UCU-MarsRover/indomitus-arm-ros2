@@ -20,9 +20,6 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'move_joints = arm_tasks.move_joints:main',
-            'move_to_point = arm_tasks.move_to_point:main',
-            'teleop_servo = arm_tasks.teleop_servo:main',
         ],
     },
 )
