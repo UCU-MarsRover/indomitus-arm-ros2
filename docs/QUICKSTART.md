@@ -7,6 +7,7 @@
 * [Starting the Arm in Simulation (Laptop)](#starting-the-arm-in-simulation-laptop)
   * [Standalone Visualization](#standalone-visualization)
   * [MoveIt Planning Simulation](#moveit-planning-simulation)
+  * [Fake Hardware vs. Real Hardware](#fake-hardware-vs-real-hardware)
 * [Turning Off the Arm](#turning-off-the-arm)
 
 **Docker**
@@ -62,6 +63,13 @@ inspecting the URDF model, meshes, and TF tree without loading ros2_control or t
    ros2 launch arm_bringup arm_standalone.launch.py
 ```
 
+By default this runs with `use_fake_hardware:=true`, which loads `mock_components/GenericSystem`
+(see [Fake Hardware vs. Real Hardware](#fake-hardware-vs-real-hardware) below). To attempt loading
+the real CAN hardware interface instead:
+```bash
+   ros2 launch arm_bringup arm_standalone.launch.py use_fake_hardware:=false
+```
+
 #### MoveIt Planning Simulation
 
 Starts the full MoveIt 2 stack with motion planning, collision checking, and trajectory
@@ -80,6 +88,22 @@ movements locally.
 
 In RViz, use the **MotionPlanning** panel to set a goal pose for the end-effector and click
 **Plan & Execute** to run a full plan-and-execute cycle.
+
+#### Fake Hardware vs. Real Hardware
+
+The `arm_macro.xacro` model exposes a `use_fake_hardware` xacro argument that controls which
+`ros2_control` hardware plugin gets loaded:
+
+| Value | Plugin | Behavior |
+|---|---|---|
+| `true` (default) | `mock_components/GenericSystem` | Joint commands are written directly into the joint state and read back immediately — no physics, no motor, no delay. Useful for testing planning logic, SRDF groups, and the MoveIt API without any physical or simulated dynamics. |
+| `false` | `arm_hardware_interface/ArmCanSystem` | Sends commands over the real CAN bus to the physical actuators. Requires the Jetson and a working `arm_hardware_interface` build. |
+
+Because `mock_components/GenericSystem` reports back whatever position it was just told to move
+to, it does **not** validate motor dynamics, CAN latency, encoder noise, or mechanical limits like
+backlash or sag — only the kinematic/geometric correctness of a trajectory is verified. For
+physics-aware simulation (inertia, joint limits, realistic dynamics), use the `arm_sim` package
+with Gazebo instead.
 
 ### Turning Off the Arm
 

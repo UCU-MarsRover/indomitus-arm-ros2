@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+  <xacro:arg name="use_fake_hardware" default="true"/>
+
   <xacro:macro name="indomitus_arm" params="parent_link *origin">
 
     <xacro:property name="mesh_path" value="package://arm_description/meshes"/>
@@ -144,7 +146,14 @@
     <!-- ROS 2 Control Configuration -->
     <ros2_control name="ArmSystem" type="system">
       <hardware>
-        <plugin>mock_components/GenericSystem</plugin>
+        <xacro:if value="$(arg use_fake_hardware)">
+          <plugin>mock_components/GenericSystem</plugin>
+        </xacro:if>
+        <xacro:unless value="$(arg use_fake_hardware)">
+          <!-- TODO: replace with the real plugin name once arm_hardware_interface is implemented -->
+          <plugin>arm_hardware_interface/ArmCanSystem</plugin>
+          <param name="can_interface">can0</param>
+        </xacro:unless>
       </hardware>
       <xacro:macro name="arm_joint_control" params="joint_name">
         <joint name="${joint_name}">
