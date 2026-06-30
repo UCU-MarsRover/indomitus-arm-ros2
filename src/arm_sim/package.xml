@@ -5,8 +5,7 @@
   <version>0.0.0</version>
   <description>
     Gazebo simulation package for the Indomitus 6-DOF manipulator.
-    Contains simulation-specific URDF tags, physics parameters, 
-    and launch files for the Gazebo (Ignition) environment.
+    Scaffold only — launch/ and urdf/ directories are not yet populated.
   </description>
   <maintainer email="indomitus@ucu.edu.ua">UCUSpaceRobotics</maintainer>
   <license>MIT</license>
