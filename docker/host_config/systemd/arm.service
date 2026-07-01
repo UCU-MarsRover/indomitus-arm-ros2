@@ -1,0 +1,17 @@
+[Unit]
+Description=Arm ROS2 Container
+After=network.target docker.service sys-subsystem-net-devices-can0.device
+Requires=docker.service sys-subsystem-net-devices-can0.device
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/home/ros/Indomitus/indomitus-arm-ros2
+
+ExecStartPre=-/usr/bin/docker compose -f docker/docker-compose.prod.yaml down
+ExecStart=/usr/bin/docker compose -f docker/docker-compose.prod.yaml up arm_prod
+ExecStop=/usr/bin/docker compose -f docker/docker-compose.prod.yaml down
+
+[Install]
+WantedBy=multi-user.target
